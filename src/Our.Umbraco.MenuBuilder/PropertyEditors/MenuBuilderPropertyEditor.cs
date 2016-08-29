@@ -16,13 +16,13 @@ using Umbraco.Web.PropertyEditors;
 
 namespace Our.Umbraco.MenuBuilder.PropertyEditors
 {
-    [PropertyEditorAsset(ClientDependencyType.Javascript, "/App_Plugins/MenuBuilder/js/jquery.nestable.js")]
-    [PropertyEditorAsset(ClientDependencyType.Javascript, "/App_Plugins/MenuBuilder/js/angular-nestable.js")]
-    [PropertyEditorAsset(ClientDependencyType.Javascript, "/App_Plugins/MenuBuilder/js/menubuilder.resources.js")]
-    [PropertyEditorAsset(ClientDependencyType.Javascript, "/App_Plugins/MenuBuilder/js/menubuilder.directives.js")]
-    [PropertyEditorAsset(ClientDependencyType.Javascript, "/App_Plugins/MenuBuilder/js/menubuilder.controllers.js")]
-    [PropertyEditorAsset(ClientDependencyType.Css, "/App_Plugins/MenuBuilder/css/menubuilder.css")]
-    [PropertyEditor(PropertyEditorAlias, "Menu Builder", "/App_Plugins/MenuBuilder/html/menubuilder.html", ValueType = "JSON")]
+    [PropertyEditorAsset(ClientDependencyType.Javascript, "~/App_Plugins/MenuBuilder/js/jquery.nestable.js")]
+    [PropertyEditorAsset(ClientDependencyType.Javascript, "~/App_Plugins/MenuBuilder/js/angular-nestable.js")]
+    [PropertyEditorAsset(ClientDependencyType.Javascript, "~/App_Plugins/MenuBuilder/js/menubuilder.resources.js")]
+    [PropertyEditorAsset(ClientDependencyType.Javascript, "~/App_Plugins/MenuBuilder/js/menubuilder.directives.js")]
+    [PropertyEditorAsset(ClientDependencyType.Javascript, "~/App_Plugins/MenuBuilder/js/menubuilder.controllers.js")]
+    [PropertyEditorAsset(ClientDependencyType.Css, "~/App_Plugins/MenuBuilder/css/menubuilder.css")]
+    [PropertyEditor(PropertyEditorAlias, "Menu Builder", "~/App_Plugins/MenuBuilder/views/menubuilder.html", ValueType = "JSON")]
     public class MenuBuilderPropertyEditor : PropertyEditor
     {
         internal const string ContentTypeAliasPropertyKey = "mbContentTypeAlias";
@@ -59,7 +59,7 @@ namespace Our.Umbraco.MenuBuilder.PropertyEditors
         {
             internal const string ContentTypesPreValueKey = "contentTypes";
 
-            [PreValueField(ContentTypesPreValueKey, "Doc Types", "/App_Plugins/MenuBuilder/views/menubuilder.doctypepicker.html", Description = "Select the doc types to use as the data blueprint.")]
+            [PreValueField(ContentTypesPreValueKey, "Doc Types", "~/App_Plugins/MenuBuilder/views/menubuilder.doctypepicker.html", Description = "Select the doc types to use as the data blueprint.")]
             public string[] ContentTypes { get; set; }
 
             [PreValueField("maxDepth", "Max Depth", "number", Description = "Set the maximum depth of the menu hieraricy.")]
@@ -88,9 +88,7 @@ namespace Our.Umbraco.MenuBuilder.PropertyEditors
         {
             public MenuBuilderPropertyValueEditor(PropertyValueEditor wrapped)
                 : base(wrapped)
-            {
-                Validators.Add(new MenuBuilderValidator());
-            }
+            { }
 
             internal ServiceContext Services
             {
@@ -114,22 +112,11 @@ namespace Our.Umbraco.MenuBuilder.PropertyEditors
 
             #region DB to String
 
-            public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+            protected void ConvertDbToStringRecusrive(JArray items)
             {
-                // Convert / validate value
-                if (property.Value == null || string.IsNullOrWhiteSpace(property.Value.ToString()))
-                    return string.Empty;
-
-                var value = JsonConvert.DeserializeObject<List<object>>(property.Value.ToString());
-                if (value == null)
-                    return string.Empty;
-
-                // Process value
-                PreValueCollection preValues = null;
-                for (var i = 0; i < value.Count; i++)
+                foreach (var item in items)
                 {
-                    var o = value[i];
-                    var propValues = ((JObject)o);
+                    var propValues = item as JObject;
 
                     var contentType = MenuBuilderHelper.GetContentTypeFromItem(propValues);
                     if (contentType == null)
@@ -162,9 +149,29 @@ namespace Our.Umbraco.MenuBuilder.PropertyEditors
                             propValues[propKey] = propEditor.ValueEditor.ConvertDbToString(prop, propType,
                                 ApplicationContext.Current.Services.DataTypeService);
                         }
+                    }
 
+                    // Process children
+                    var childrenProp = propValues.Properties().FirstOrDefault(x => x.Name == "children");
+                    if (childrenProp != null)
+                    {
+                        ConvertDbToStringRecusrive(childrenProp.Value.Value<JArray>());
                     }
                 }
+            }
+
+            public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+            {
+                // Convert / validate value
+                if (property.Value == null || string.IsNullOrWhiteSpace(property.Value.ToString()))
+                    return string.Empty;
+
+                var value = JsonConvert.DeserializeObject<JArray>(property.Value.ToString());
+                if (value == null)
+                    return string.Empty;
+
+                // Process value
+                ConvertDbToStringRecusrive(value);
 
                 // Update the value on the property
                 property.Value = JsonConvert.SerializeObject(value);
@@ -177,21 +184,11 @@ namespace Our.Umbraco.MenuBuilder.PropertyEditors
 
             #region DB to Editor
 
-            public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+            protected void ConvertDbToEditorRecursive(JArray items)
             {
-                if (property.Value == null || string.IsNullOrWhiteSpace(property.Value.ToString()))
-                    return string.Empty;
-
-                var value = JsonConvert.DeserializeObject<List<object>>(property.Value.ToString());
-                if (value == null)
-                    return string.Empty;
-
-                // Process value
-                PreValueCollection preValues = null;
-                for (var i = 0; i < value.Count; i++)
+                foreach (var item in items)
                 {
-                    var o = value[i];
-                    var propValues = ((JObject)o);
+                    var propValues = item as JObject;
 
                     var contentType = MenuBuilderHelper.GetContentTypeFromItem(propValues);
                     if (contentType == null)
@@ -229,7 +226,27 @@ namespace Our.Umbraco.MenuBuilder.PropertyEditors
                         }
 
                     }
+
+                    // Process children
+                    var childrenProp = propValues.Properties().FirstOrDefault(x => x.Name == "children");
+                    if (childrenProp != null)
+                    {
+                        ConvertDbToEditorRecursive(childrenProp.Value.Value<JArray>());
+                    }
                 }
+            }
+
+            public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+            {
+                if (property.Value == null || string.IsNullOrWhiteSpace(property.Value.ToString()))
+                    return string.Empty;
+
+                var value = JsonConvert.DeserializeObject<JArray>(property.Value.ToString());
+                if (value == null)
+                    return string.Empty;
+
+                // Process value
+                ConvertDbToEditorRecursive(value);
 
                 // Update the value on the property
                 property.Value = JsonConvert.SerializeObject(value);
@@ -242,24 +259,12 @@ namespace Our.Umbraco.MenuBuilder.PropertyEditors
 
             #region Editor to DB
 
-            public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
+            protected void ConvertEditorToDbRecursive(JArray items)
             {
-                if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
-                    return null;
-
-                var value = JsonConvert.DeserializeObject<List<object>>(editorValue.Value.ToString());
-                if (value == null)
-                    return null;
-
-                // Issue #38 - Keep recursive property lookups working
-                if (!value.Any())
-                    return null;
-
                 // Process value
-                for (var i = 0; i < value.Count; i++)
+                foreach (var item in items)
                 {
-                    var o = value[i];
-                    var propValues = ((JObject)o);
+                    var propValues = item as JObject;
 
                     var contentType = MenuBuilderHelper.GetContentTypeFromItem(propValues);
                     if (contentType == null)
@@ -302,7 +307,30 @@ namespace Our.Umbraco.MenuBuilder.PropertyEditors
                         }
 
                     }
+
+                    // Process children
+                    var childrenProp = propValues.Properties().FirstOrDefault(x => x.Name == "children");
+                    if (childrenProp != null)
+                    {
+                        ConvertEditorToDbRecursive(childrenProp.Value.Value<JArray>());
+                    }
                 }
+            }
+
+            public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
+            {
+                if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
+                    return null;
+
+                var value = JsonConvert.DeserializeObject<JArray>(editorValue.Value.ToString());
+                if (value == null)
+                    return null;
+
+                // Issue #38 - Keep recursive property lookups working
+                if (!value.Any())
+                    return null;
+
+                ConvertEditorToDbRecursive(value);
 
                 return JsonConvert.SerializeObject(value);
             }
@@ -310,75 +338,11 @@ namespace Our.Umbraco.MenuBuilder.PropertyEditors
             #endregion
         }
 
-        internal class MenuBuilderValidator : IPropertyValidator
-        {
-            public IEnumerable<ValidationResult> Validate(object rawValue, PreValueCollection preValues, PropertyEditor editor)
-            {
-                var value = JsonConvert.DeserializeObject<List<object>>(rawValue.ToString());
-                if (value == null)
-                    yield break;
-
-                IDataTypeService dataTypeService = ApplicationContext.Current.Services.DataTypeService;
-                for (var i = 0; i < value.Count; i++)
-                {
-                    var o = value[i];
-                    var propValues = ((JObject)o);
-
-                    var contentType = MenuBuilderHelper.GetContentTypeFromItem(propValues);
-                    if (contentType == null)
-                    {
-                        continue;
-                    }
-
-                    var propValueKeys = propValues.Properties().Select(x => x.Name).ToArray();
-
-                    foreach (var propKey in propValueKeys)
-                    {
-                        var propType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propKey);
-                        if (propType != null)
-                        {
-                            PreValueCollection propPrevalues = dataTypeService.GetPreValuesCollectionByDataTypeId(propType.DataTypeDefinitionId);
-                            PropertyEditor propertyEditor = PropertyEditorResolver.Current.GetByAlias(propType.PropertyEditorAlias);
-
-                            foreach (IPropertyValidator validator in propertyEditor.ValueEditor.Validators)
-                            {
-                                foreach (ValidationResult result in validator.Validate(propValues[propKey], propPrevalues, propertyEditor))
-                                {
-                                    result.ErrorMessage = "Item " + (i + 1) + " '" + propType.Name + "' " + result.ErrorMessage;
-                                    yield return result;
-                                }
-                            }
-
-                            // Check mandatory
-                            if (propType.Mandatory)
-                            {
-                                if (propValues[propKey] == null)
-                                    yield return new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' cannot be null", new[] { propKey });
-                                else if (propValues[propKey].ToString().IsNullOrWhiteSpace())
-                                    yield return new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' cannot be empty", new[] { propKey });
-                            }
-
-                            // Check regex
-                            if (!propType.ValidationRegExp.IsNullOrWhiteSpace()
-                                && propValues[propKey] != null && !propValues[propKey].ToString().IsNullOrWhiteSpace())
-                            {
-                                var regex = new Regex(propType.ValidationRegExp);
-                                if (!regex.IsMatch(propValues[propKey].ToString()))
-                                {
-                                    yield return new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' is invalid, it does not match the correct pattern", new[] { propKey });
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         #endregion
 
         private static bool IsSystemPropertyKey(string propKey)
         {
-            return propKey == "name" || propKey == ContentTypeAliasPropertyKey;
+            return propKey == "name" || propKey == "children" || propKey == "key" || propKey == ContentTypeAliasPropertyKey;
         }
     }
 }

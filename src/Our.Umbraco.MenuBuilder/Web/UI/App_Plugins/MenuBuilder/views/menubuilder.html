@@ -1,0 +1,32 @@
+﻿<div id="menu-builder--{{model.id}}" class="menu-builder-container"
+     ng-controller="Our.Umbraco.MenuBuilder.Controllers.MenuBuilderPropertyEditorController">
+
+    <ng-form>
+        
+        <div ng-nestable ng-model="items">
+            <span ng-click="editItem($item)">{{$item.name}}</span>
+            <div class="dd-item-actions">
+                <a prevent-default ng-click="remove()">
+                    <i class="icon icon-trash"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="dd-actions">
+            <a ng-click="openContentTypePickerOverlay($event)" prevent-default>Add new item</a>
+        </div>
+
+        <umb-overlay ng-if="contentTypePickerOverlay.show"
+                     model="contentTypePickerOverlay"
+                     view="contentTypePickerOverlay.view"
+                     position="target">
+        </umb-overlay>
+
+        <umb-overlay ng-if="contentEditorOverlay.show"
+                     model="contentEditorOverlay"
+                     view="contentEditorOverlay.view"
+                     position="right">
+        </umb-overlay>
+
+    </ng-form>
+</div>

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Linq;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using Our.Umbraco.MenuBuilder.PropertyEditors;
-using Our.Umbraco.MenuBuilder.Extensions;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 
@@ -21,6 +18,8 @@ namespace Our.Umbraco.MenuBuilder.Helpers
 
         public static string GetContentTypeAliasFromItem(JObject item)
         {
+            if (item == null) return null;
+
             var contentTypeAliasProperty = item[MenuBuilderPropertyEditor.ContentTypeAliasPropertyKey];
             if (contentTypeAliasProperty == null)
             {
@@ -40,15 +39,5 @@ namespace Our.Umbraco.MenuBuilder.Helpers
 
             return ApplicationContext.Current.Services.ContentTypeService.GetContentType(contentTypeAlias);
         }
-
-        #region Conversion from v0.1.1 data formats
-        
-
-        private static string ContentTypesPreValueKey
-        {
-            get { return MenuBuilderPropertyEditor.MenuBuilderPreValueEditor.ContentTypesPreValueKey; }
-        }
-
-        #endregion
     }
 }

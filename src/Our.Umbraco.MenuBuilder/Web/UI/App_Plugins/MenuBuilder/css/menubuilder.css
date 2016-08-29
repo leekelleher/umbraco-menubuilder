@@ -1,4 +1,32 @@
-﻿.menu-builder-container {
+﻿/*
+    Doc Type Picker
+*/
+.menu-builder__doctypepicker table input, .menu-builder__doctypepicker table select {
+    width: 100%;
+    padding-right: 0;
+}
+
+.menu-builder__doctypepicker table td.icon-navigation, .menu-builder__doctypepicker i.menu-builder__help-icon {
+    vertical-align: middle;
+    color: #CCC;
+}
+
+.menu-builder__doctypepicker table td.icon-navigation:hover, .menu-builder__doctypepicker i.menu-builder__help-icon:hover {
+    color: #343434;
+}
+
+.menu-builder__doctypepicker i.menu-builder__help-icon {
+    margin-left: 10px;
+}
+
+.menu-builder__doctypepicker table .td-min {
+    width: 1px;
+}
+
+/*
+    Nestable
+*/
+.menu-builder-container {
     max-width: 80%;
 }
 

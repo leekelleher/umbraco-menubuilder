@@ -1,0 +1,12 @@
+﻿
+    <div class="mb-dialog" ng-controller="Our.Umbraco.MenuBuilder.MenuBuilderDialogController">
+
+        <fieldset ng-repeat="tab in item.tabs">
+            
+            <umb-property property="property" ng-repeat="property in tab.properties">
+                <umb-editor model="property"></umb-editor>
+            </umb-property>
+
+        </fieldset>
+
+    </div>

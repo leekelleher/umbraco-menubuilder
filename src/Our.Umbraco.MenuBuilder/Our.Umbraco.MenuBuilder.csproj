@@ -271,13 +271,21 @@
   <ItemGroup>
     <Content Include="Web\UI\App_Plugins\MenuBuilder\css\menubuilder.css" />
     <Content Include="Web\UI\App_Plugins\MenuBuilder\js\menubuilder.controllers.js" />
-    <Content Include="Web\UI\App_Plugins\MenuBuilder\js\menubuilder.directives.js" />
     <Content Include="Web\UI\App_Plugins\MenuBuilder\js\menubuilder.resources.js" />
-    <Content Include="Web\UI\App_Plugins\MenuBuilder\html\menubuilder.doctypepicker.html" />
-    <Content Include="Web\UI\App_Plugins\MenuBuilder\html\menubuilder.editor.html" />
-    <Content Include="Web\UI\App_Plugins\MenuBuilder\html\menubuilder.html" />
+    <Content Include="Web\UI\App_Plugins\MenuBuilder\views\menubuilder.doctypepicker.html" />
+    <Content Include="Web\UI\App_Plugins\MenuBuilder\views\menubuilder.dialog.html" />
+    <Content Include="Web\UI\App_Plugins\MenuBuilder\views\menubuilder.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>IF %25ComputerName%25 == MBP13-PC-BC (
+  IF NOT "$(SolutionDir)" == "*Undefined*" (
+    xcopy /s /y "$(TargetPath)" "C:\Users\Matt\Work\Sandbox\Umbraco\UmbracoCms.7.5.2\bin"
+    xcopy /s /y "$(TargetDir)$(ProjectName).pdb" "C:\Users\Matt\Work\Sandbox\Umbraco\UmbracoCms.7.5.2\bin"
+    xcopy /s /y "$(ProjectDir)Web\UI\*.*" "C:\Users\Matt\Work\Sandbox\Umbraco\UmbracoCms.7.5.2\"
+  )
+)</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

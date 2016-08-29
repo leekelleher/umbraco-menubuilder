@@ -8,8 +8,9 @@ using Umbraco.Web.Models;
 
 namespace Our.Umbraco.MenuBuilder.Models
 {
-    internal class DetachedPublishedContent : PublishedContentBase
+    internal class DetachedPublishedContent : PublishedContentBase, IPublishedContentWithKey
     {
+        private readonly Guid _key;
         private readonly string _name;
         private readonly PublishedContentType _contentType;
         private readonly IEnumerable<IPublishedProperty> _properties;
@@ -17,19 +18,40 @@ namespace Our.Umbraco.MenuBuilder.Models
         private readonly bool _isPreviewing;
         private readonly IPublishedContent _containerNode;
 
-        public DetachedPublishedContent(string name,
+        private readonly IPublishedContent _parentNode;
+        private IEnumerable<IPublishedContent>_children;
+        private int _level;
+
+        public DetachedPublishedContent(Guid key,
+            string name,
             PublishedContentType contentType,
             IEnumerable<IPublishedProperty> properties,
             IPublishedContent containerNode = null,
+            IPublishedContent parentNode = null,
             int sortOrder = 0,
+            int level = 0,
             bool isPreviewing = false)
         {
+            _key = key;
             _name = name;
             _contentType = contentType;
             _properties = properties;
             _sortOrder = sortOrder;
+            _level = level;
             _isPreviewing = isPreviewing;
             _containerNode = containerNode;
+            _parentNode = parentNode;
+            _children = Enumerable.Empty<IPublishedContent>();
+        }
+
+        internal void SetChildren(IEnumerable<IPublishedContent> children)
+        {
+            _children = children;
+        }
+
+        public Guid Key
+        {
+            get { return _key; }
         }
 
         public override int Id
@@ -79,20 +101,22 @@ namespace Our.Umbraco.MenuBuilder.Models
 
         public override IPublishedProperty GetProperty(string alias, bool recurse)
         {
-            if (recurse)
-                throw new NotSupportedException();
+            var prop = GetProperty(alias);
 
-            return GetProperty(alias);
+            if (recurse && Parent != null && prop == null)
+                return Parent.GetProperty(alias, true);
+
+            return prop;
         }
 
         public override IPublishedContent Parent
         {
-            get { return null; }
+            get { return _parentNode; }
         }
 
         public override IEnumerable<IPublishedContent> Children
         {
-            get { return Enumerable.Empty<IPublishedContent>(); }
+            get { return _children; }
         }
 
         public override int TemplateId
@@ -152,7 +176,7 @@ namespace Our.Umbraco.MenuBuilder.Models
 
         public override int Level
         {
-            get { return 0; }
+            get { return _level; }
         }
     }
 }
