@@ -270,6 +270,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Web\UI\App_Plugins\MenuBuilder\css\menubuilder.css" />
+    <Content Include="Web\UI\App_Plugins\MenuBuilder\js\angular-nestable.js" />
+    <Content Include="Web\UI\App_Plugins\MenuBuilder\js\jquery.nestable.js" />
     <Content Include="Web\UI\App_Plugins\MenuBuilder\js\menubuilder.controllers.js" />
     <Content Include="Web\UI\App_Plugins\MenuBuilder\js\menubuilder.resources.js" />
     <Content Include="Web\UI\App_Plugins\MenuBuilder\views\menubuilder.doctypepicker.html" />

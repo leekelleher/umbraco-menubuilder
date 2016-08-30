@@ -2,11 +2,14 @@
      ng-controller="Our.Umbraco.MenuBuilder.Controllers.MenuBuilderPropertyEditorController">
 
     <ng-form>
-        
+
         <div ng-nestable="nestableOptions" ng-model="items">
-            <span ng-click="editItem($item)">{{$item.name}}</span>
+            <div class="dd-item-label" ng-click="editItem($item)">
+                <i ng-if="showIcons" class="icon" ng-class="getIcon($item)"></i>
+                <span>{{$item.name}}</span>
+            </div>
             <div class="dd-item-actions">
-                <a prevent-default ng-click="remove()">
+                <a prevent-default ng-click="deleteItem($item); $event.stopPropagation();">
                     <i class="icon icon-trash"></i>
                 </a>
             </div>

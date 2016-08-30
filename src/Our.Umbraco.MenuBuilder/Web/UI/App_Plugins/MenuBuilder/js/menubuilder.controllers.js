@@ -56,11 +56,12 @@ angular.module("umbraco").controller("Our.Umbraco.MenuBuilder.Controllers.MenuBu
     "$nestable",
     "$interpolate",
     "$filter",
+    "$timeout",
     "contentResource",
     "localizationService",
     "Our.Umbraco.MenuBuilder.Resources.MenuBuilderResources",
 
-    function ($scope, $nestable, $interpolate, $filter, contentResource, localizationService, mbResources) {
+    function ($scope, $nestable, $interpolate, $filter, $timeout, contentResource, localizationService, mbResources) {
 
         $nestable.enableDraggableHandle = true;
 
@@ -78,6 +79,7 @@ angular.module("umbraco").controller("Our.Umbraco.MenuBuilder.Controllers.MenuBu
         // Declare variables
         $scope.items = [];
         $scope.scaffolds = [];
+        $scope.showIcons = $scope.model.config.showIcons || true;
 
         $scope.nestableOptions = {
             maxDepth : $scope.model.config.maxDepth || 10
@@ -170,6 +172,53 @@ angular.module("umbraco").controller("Our.Umbraco.MenuBuilder.Controllers.MenuBu
             });
 
         }
+
+        $scope.getIcon = function (item) {
+            var scaffold = getScaffold(item.mbContentTypeAlias);
+            return scaffold && scaffold.icon && scaffold.icon !== ".sprTreeFolder" ? scaffold.icon : "icon-folder";
+        }
+
+        $scope.deleteItem = function (item) {
+
+            var filterItems = function (itm, col) {
+                var newItems = [];
+                for (var i = 0; i < col.length; i++) {
+                    var itm2 = col[i];
+                    if (itm2.item.key != itm.key) {
+                        if (itm2.children) {
+                            itm2.children = filterItems(itm, itm2.children);
+                        }
+                        newItems.push(itm2); 
+                    }
+                }
+                return newItems;
+            };
+
+            if ($scope.items.length) {
+                if ($scope.model.config.confirmDeletes && $scope.model.config.confirmDeletes == 1) {
+                    if (confirm("Are you sure you want to delete this item?")) {
+                        // ng-nestable only does a shallow watch on the model so we have to force the array to udpate
+                        // by first setting it to an empty array, and in the next processor cycle, set it back
+                        var newItems1 = filterItems(item, $scope.items);
+                        $scope.items = [];
+                        $timeout(function() {
+                            $scope.items = newItems1;
+                        }, 1);
+                        updateModel();
+                    }
+                } else {
+                    // ng-nestable only does a shallow watch on the model so we have to force the array to udpate
+                    // by first setting it to an empty array, and in the next processor cycle, set it back
+                    var newItems2 = filterItems(item, $scope.items);
+                    $scope.items = [];
+                    $timeout(function () {
+                        $scope.items = newItems2;
+                    }, 1);
+                    updateModel();
+                }
+            }
+
+        };
 
         // Helpers
         var UUID = (function () {
@@ -326,7 +375,6 @@ angular.module("umbraco").controller("Our.Umbraco.MenuBuilder.Controllers.MenuBu
         var updateModel = function () {
             if (inited) {
                 var newValues = updateModelRecursive($scope.items);
-                console.log(newValues);
                 $scope.model.value = newValues;
             }
         }
@@ -397,8 +445,6 @@ angular.module("umbraco").controller("Our.Umbraco.MenuBuilder.Controllers.MenuBu
                 $scope.scaffolds = $filter('orderBy')($scope.scaffolds, function (s) {
                     return contentTypeAliases.indexOf(s.contentTypeAlias);
                 });
-
-                console.log($scope.model.value);
 
                 // Convert stored value
                 if ($scope.model.value) {
