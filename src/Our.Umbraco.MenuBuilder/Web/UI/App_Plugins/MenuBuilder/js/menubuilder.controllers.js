@@ -13,8 +13,7 @@ angular.module("umbraco").controller("Our.Umbraco.MenuBuilder.Controllers.DocTyp
                 mbContentTypeAlias: "",
                 mbTabAlias: "",
                 nameTemplate: ""
-            }
-            );
+            });
         }
 
         $scope.selectedDocTypeTabs = function (cfg) {
@@ -67,6 +66,8 @@ angular.module("umbraco").controller("Our.Umbraco.MenuBuilder.Controllers.MenuBu
 
         var inited = false;
 
+        console.log($scope);
+
         // Interpolate the name templates
         _.each($scope.model.config.contentTypes, function (contentType) {
             contentType.nameExp = !!contentType.nameTemplate
@@ -77,8 +78,10 @@ angular.module("umbraco").controller("Our.Umbraco.MenuBuilder.Controllers.MenuBu
         // Declare variables
         $scope.items = [];
         $scope.scaffolds = [];
-        $scope.maxDepth = $scope.model.config.maxDepth || 10;
-        $scope.wideMode = $scope.model.config.hideLabel == "1";
+
+        $scope.nestableOptions = {
+            maxDepth : $scope.model.config.maxDepth || 10
+        };
 
         // Declare scope functions
         $scope.openContentTypePickerOverlay = function (event) {

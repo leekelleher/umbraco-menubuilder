@@ -3,7 +3,7 @@
 
     <ng-form>
         
-        <div ng-nestable ng-model="items">
+        <div ng-nestable="nestableOptions" ng-model="items">
             <span ng-click="editItem($item)">{{$item.name}}</span>
             <div class="dd-item-actions">
                 <a prevent-default ng-click="remove()">
