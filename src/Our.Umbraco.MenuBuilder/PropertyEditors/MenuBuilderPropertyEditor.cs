@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text.RegularExpressions;
 using ClientDependency.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -19,7 +17,6 @@ namespace Our.Umbraco.MenuBuilder.PropertyEditors
     [PropertyEditorAsset(ClientDependencyType.Javascript, "~/App_Plugins/MenuBuilder/js/jquery.nestable.js")]
     [PropertyEditorAsset(ClientDependencyType.Javascript, "~/App_Plugins/MenuBuilder/js/angular-nestable.js")]
     [PropertyEditorAsset(ClientDependencyType.Javascript, "~/App_Plugins/MenuBuilder/js/menubuilder.resources.js")]
-    [PropertyEditorAsset(ClientDependencyType.Javascript, "~/App_Plugins/MenuBuilder/js/menubuilder.directives.js")]
     [PropertyEditorAsset(ClientDependencyType.Javascript, "~/App_Plugins/MenuBuilder/js/menubuilder.controllers.js")]
     [PropertyEditorAsset(ClientDependencyType.Css, "~/App_Plugins/MenuBuilder/css/menubuilder.css")]
     [PropertyEditor(PropertyEditorAlias, "Menu Builder", "~/App_Plugins/MenuBuilder/views/menubuilder.html", ValueType = "JSON")]

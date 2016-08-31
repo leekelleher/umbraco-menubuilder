@@ -19,7 +19,7 @@ namespace Our.Umbraco.MenuBuilder.Models
         private readonly IPublishedContent _containerNode;
 
         private readonly IPublishedContent _parentNode;
-        private IEnumerable<IPublishedContent>_children;
+        private IEnumerable<IPublishedContent> _children;
         private int _level;
 
         public DetachedPublishedContent(Guid key,
