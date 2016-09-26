@@ -1,25 +1,35 @@
-# Umbraco Menu Builder
+# Menu Builder
 
-A hierarchical list builder for Umbraco.
+A hierarchical list builder for Umbraco 7.
 
-## Ideas
+> **This package is currently under development**
 
-### JS Libraries
+---
 
-- [Nestable](https://github.com/dbushell/Nestable)
-- [ng-nestable](https://github.com/kamilkp/ng-nestable)
+## Contributing to this project
 
-- [laravel-shop-menu](https://github.com/msurguy/laravel-shop-menu)
-- [doMenu](https://github.com/mechanicious/domenu)
+Anyone and everyone is welcome to contribute. Please take a moment to review the [guidelines for contributing](CONTRIBUTING.md).
 
-
-### Requirements
-
-- Build menu structure, add items, nest items, edit opens "meta data" dialog (similar to Photon)
-- Pick from Content, Media or freetext (external) URL
-- Additional meta-data includes, querystring, anchor, CSS icon (and Sprite name?)
+* [Bug reports](CONTRIBUTING.md#bugs)
+* [Feature requests](CONTRIBUTING.md#features)
+* [Pull requests](CONTRIBUTING.md#pull-requests)
 
 
-### Potential icon
+## Contact
 
-https://thenounproject.com/search/?q=indent&i=2835
+Have a question?
+
+* [Raise an issue](https://github.com/leekelleher/umbraco-menubuilder/issues) on GitHub
+
+
+## Dev Team
+
+* [Matt Brailsford](https://github.com/mattbrailsford)
+* [Lee Kelleher](https://github.com/leekelleher)
+
+
+## License
+
+Copyright &copy; 2016 Umbrella Inc, Our Umbraco and [other contributors](https://github.com/leekelleher/umbraco-menubuilder/graphs/contributors)
+
+Licensed under the [MIT License](LICENSE.md)
