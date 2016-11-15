@@ -33,3 +33,10 @@ Have a question?
 Copyright &copy; 2016 Umbrella Inc, Our Umbraco and [other contributors](https://github.com/leekelleher/umbraco-menubuilder/graphs/contributors)
 
 Licensed under the [MIT License](LICENSE.md)
+
+### Credits
+
+This Umbraco package makes use of the following open-source libraries:
+
+* [Nestable](https://github.com/dbushell/Nestable) (MIT license)
+* [ng-nestable](https://github.com/kamilkp/ng-nestable) (MIT License)
