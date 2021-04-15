@@ -1,8 +1,10 @@
 # Menu Builder
 
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+
 A hierarchical list builder for Umbraco 7.
 
-> **This package is currently under development**
+> **The development of this package was never completed.**
 
 ---
 
