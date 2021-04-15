@@ -11,8 +11,6 @@ angular.module("umbraco").controller("Our.Umbraco.MenuBuilder.Controllers.Proper
 
         vm.items = [];
 
-        vm.showIcons = $scope.model.config.showIcons || true;
-
         vm.nestableOptions = {
             maxDepth: $scope.model.config.maxDepth || 10
         };
@@ -26,16 +24,23 @@ angular.module("umbraco").controller("Our.Umbraco.MenuBuilder.Controllers.Proper
                 model: null
             },
             callback: function (data) {
-                innerContentService.populateName(data.model, data.idx, $scope.model.config.contentTypes);
+                console.log("callback", data);
+
+                innerContentService.populateName(data.model, 0, $scope.model.config.contentTypes);
 
                 if (!($scope.model.value instanceof Array)) {
                     $scope.model.value = [];
                 }
 
                 if (data.action === "add") {
+
                     $scope.model.value.push(data.model);
+
+                    vm.items.push({ item: data.model, children: [] });
+
                 } else if (data.action === "edit") {
                     $scope.model.value[data.idx] = data.model;
+                    vm.items[data.idx].item = data.model;
                 }
             }
         };
@@ -46,18 +51,19 @@ angular.module("umbraco").controller("Our.Umbraco.MenuBuilder.Controllers.Proper
 
         function add($event) {
             vm.overlayConfig.event = $event;
-            vm.overlayConfig.data = { model: null, idx: $scope.model.value.length, action: "add" };
+            vm.overlayConfig.data = { model: null, action: "add" };
             vm.overlayConfig.show = true;
         };
 
-        function edit($event, $index, item) {
+        function edit(item) {
             vm.overlayConfig.event = $event;
-            vm.overlayConfig.data = { model: item, idx: $index, action: "edit" };
+            vm.overlayConfig.data = { model: item, action: "edit" };
             vm.overlayConfig.show = true;
         };
 
-        function remove($index) {
-            $scope.model.value.splice($index, 1);
+        function remove(item) {
+            //$scope.model.value.splice($index, 1);
+            // TODO: Find the `item` and remove it
             setDirty();
         };
 
@@ -87,6 +93,9 @@ angular.module("umbraco").controller("Our.Umbraco.MenuBuilder.Controllers.Proper
                     });
                 });
 
+                _.each($scope.model.value, function (item) {
+                    vm.items.push({ item: item, children: [] });
+                });
             }
         }
 

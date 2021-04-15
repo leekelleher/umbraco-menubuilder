@@ -2,7 +2,7 @@
 
     <div ng-nestable="vm.nestableOptions" ng-model="vm.items">
         <div class="dd-item-label" ng-click="vm.edit($item)">
-            <i ng-if="vm.showIcons" class="icon" ng-class="$item.icon"></i>
+            <i class="icon" ng-class="$item.icon"></i>
             <span>{{$item.name}}</span>
         </div>
         <div class="dd-item-actions">
